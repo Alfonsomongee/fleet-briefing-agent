@@ -1,52 +1,45 @@
 import type { Kpis } from "../lib/api";
 
-const KPI_LABELS: Record<keyof Kpis, string> = {
-  tasa_utilizacion:  "Tasa utilización",
-  fleet_availability: "Disponibilidad flota",
-  mttr_horas:        "MTTR (h)",
-  cost_per_km:       "Coste / km (€)",
-  on_time_rate:      "Tasa puntualidad",
-  revenue_proxy:     "Revenue proxy (€)",
-};
+const kpiMeta: { key: keyof Kpis; label: string; fmt: (v: number) => string }[] = [
+  { key: "tasa_utilizacion",   label: "Utilización",      fmt: v => `${(v * 100).toFixed(1)}%` },
+  { key: "fleet_availability", label: "Disponibilidad",   fmt: v => `${(v * 100).toFixed(1)}%` },
+  { key: "mttr_horas",         label: "MTTR",             fmt: v => `${v.toFixed(2)} h` },
+  { key: "cost_per_km",        label: "Coste / km",       fmt: v => `€ ${v.toFixed(3)}` },
+  { key: "on_time_rate",       label: "Puntualidad",      fmt: v => `${(v * 100).toFixed(1)}%` },
+  { key: "revenue_proxy",      label: "Revenue estimado", fmt: v => `€ ${v.toFixed(0)}` },
+];
 
-function delta(today: number, baseline: number) {
-  if (!baseline) return 0;
-  return ((today - baseline) / baseline) * 100;
-}
+interface Props { today?: Partial<Kpis>; baseline?: Partial<Kpis>; }
 
-export default function KpiTable({ today, baseline }: { today: Kpis; baseline: Kpis }) {
+export default function KpiTable({ today, baseline }: Props) {
+  if (!today) return null;
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-100">
+    <div className="overflow-hidden rounded-xl" style={{ border: "1px solid rgba(255,255,255,0.05)" }}>
       <table className="w-full text-xs">
         <thead>
-          <tr className="bg-slate-50 border-b border-slate-100">
-            <th className="text-left px-3 py-2 font-semibold text-slate-400 uppercase tracking-wider">KPI</th>
-            <th className="text-right px-3 py-2 font-semibold text-slate-400 uppercase tracking-wider">Hoy</th>
-            <th className="text-right px-3 py-2 font-semibold text-slate-400 uppercase tracking-wider">7d base</th>
-            <th className="text-right px-3 py-2 font-semibold text-slate-400 uppercase tracking-wider">Var.</th>
+          <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.02)" }}>
+            <th className="px-3 py-2 text-left text-[10px] font-semibold text-zinc-600 uppercase tracking-widest">KPI</th>
+            <th className="px-3 py-2 text-right text-[10px] font-semibold text-zinc-600 uppercase tracking-widest">Hoy</th>
+            {baseline && <th className="px-3 py-2 text-right text-[10px] font-semibold text-zinc-600 uppercase tracking-widest">7 d</th>}
+            {baseline && <th className="px-3 py-2 text-right text-[10px] font-semibold text-zinc-600 uppercase tracking-widest">Δ</th>}
           </tr>
         </thead>
         <tbody>
-          {(Object.keys(KPI_LABELS) as (keyof Kpis)[]).map((key) => {
-            const d = delta(today[key], baseline[key]);
-            const pos = d >= 0;
-            const sig = Math.abs(d) > 0.01;
+          {kpiMeta.map(({ key, label, fmt }) => {
+            const v  = today[key] ?? 0;
+            const bv = baseline?.[key] ?? 0;
+            const d  = bv ? ((v - bv) / bv) * 100 : 0;
+            const up = d > 2, dn = d < -2;
             return (
-              <tr key={key} className="border-t border-slate-50 hover:bg-slate-50/60 transition-colors">
-                <td className="px-3 py-2 text-slate-600">{KPI_LABELS[key]}</td>
-                <td className="px-3 py-2 text-right font-mono text-slate-800 tabular-nums">{today[key]?.toFixed(3)}</td>
-                <td className="px-3 py-2 text-right font-mono text-slate-400 tabular-nums">{baseline[key]?.toFixed(3)}</td>
-                <td className="px-3 py-2 text-right">
-                  {sig ? (
-                    <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded font-mono font-semibold text-xs ${
-                      pos ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
-                    }`}>
-                      {pos ? "+" : ""}{d.toFixed(1)}%
-                    </span>
-                  ) : (
-                    <span className="text-slate-300 font-mono">—</span>
-                  )}
-                </td>
+              <tr key={key} style={{ borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
+                <td className="px-3 py-2 text-zinc-400">{label}</td>
+                <td className="px-3 py-2 text-right text-zinc-100 font-mono">{fmt(v)}</td>
+                {baseline && <td className="px-3 py-2 text-right text-zinc-600 font-mono">{fmt(bv)}</td>}
+                {baseline && (
+                  <td className={`px-3 py-2 text-right font-mono font-semibold ${up ? "text-emerald-400" : dn ? "text-red-400" : "text-zinc-600"}`}>
+                    {up ? "↑" : dn ? "↓" : "·"} {Math.abs(d).toFixed(1)}%
+                  </td>
+                )}
               </tr>
             );
           })}

@@ -1,50 +1,23 @@
-// All API calls go to Next.js API routes — no external backend needed.
-
 export interface Kpis {
-  tasa_utilizacion: number;
+  tasa_utilizacion:   number;
   fleet_availability: number;
-  mttr_horas: number;
-  cost_per_km: number;
-  on_time_rate: number;
-  revenue_proxy: number;
-}
-
-export interface Anomaly {
-  kpi: string;
-  valor_hoy: number;
-  valor_baseline: number;
-  desviacion_pct: number;
-  direccion: "bajada" | "subida";
-  critico: boolean;
+  mttr_horas:         number;
+  cost_per_km:        number;
+  on_time_rate:       number;
+  revenue_proxy:      number;
 }
 
 export interface Briefing {
-  id: string;
-  date: string;
-  city: string;
-  resumen: string;
-  alertas: string[];
-  recomendacion: string;
-  prioridad: "alta" | "media" | "baja" | "desconocida";
-  kpis_today: Kpis;
-  kpis_baseline: Kpis;
-  anomalies: Anomaly[];
+  id:              string;
+  date:            string;
+  city:            string;
+  resumen:         string;
+  alertas:         string[];
+  recomendacion:   string;
+  prioridad:       "alta" | "media" | "baja" | "desconocida";
+  kpis_today?:     Partial<Kpis>;
+  kpis_baseline?:  Partial<Kpis>;
+  anomalies?:      unknown[];
   anomalies_count: number;
-  created_at: string;
-}
-
-export async function fetchBriefings(date: string): Promise<Briefing[]> {
-  const res = await fetch(`/api/briefings?date=${date}`, {
-    next: { revalidate: 300 },
-  });
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
-  const data = await res.json();
-  return data.briefings as Briefing[];
-}
-
-export async function fetchDates(): Promise<string[]> {
-  const res = await fetch("/api/dates", { next: { revalidate: 60 } });
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.dates as string[];
+  created_at:      string;
 }

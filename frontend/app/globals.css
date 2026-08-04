@@ -2,63 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    background-color: #F8FAFC;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ── Base ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: #09090b;
+  color: #fafafa;
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Skeleton shimmer */
-@keyframes skeleton-shimmer {
-  0% { background-position: -400px 0; }
-  100% { background-position: 400px 0; }
+/* ── Scrollbar ─────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
 }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.14); }
 
+/* ── Skeleton ──────────────────────────────────────────── */
 .skeleton {
-  background: linear-gradient(90deg, #F1F5F9 25%, #E8EDF2 50%, #F1F5F9 75%);
-  background-size: 800px 100%;
-  animation: skeleton-shimmer 1.4s ease-in-out infinite;
-  border-radius: 0.75rem;
+  @apply rounded-2xl bg-zinc-800/40 animate-pulse;
 }
 
-/* Fade-in-up for results */
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* ── Dot grid background ───────────────────────────────── */
+.dot-grid {
+  background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
 
-.animate-fade-in-up {
-  animation: fade-in-up 0.35s ease-out forwards;
+/* ── Glass card base ───────────────────────────────────── */
+.glass {
+  background: rgba(18, 18, 20, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* Stagger children */
-.animate-fade-in-up:nth-child(1) { animation-delay: 0ms; }
-.animate-fade-in-up:nth-child(2) { animation-delay: 60ms; }
-.animate-fade-in-up:nth-child(3) { animation-delay: 120ms; }
-.animate-fade-in-up:nth-child(4) { animation-delay: 180ms; }
-
-/* Upload zone drag-active pulse */
-@keyframes border-pulse {
-  0%, 100% { border-color: #93C5FD; }
-  50% { border-color: #3B82F6; }
-}
-
-.upload-drag-active {
-  animation: border-pulse 1.2s ease-in-out infinite;
-}
-
-/* Details chevron */
-details > summary {
-  list-style: none;
-}
-details > summary::-webkit-details-marker {
-  display: none;
-}
+/* ── Details / summary reset ───────────────────────────── */
+details > summary { list-style: none; }
+details > summary::-webkit-details-marker { display: none; }
