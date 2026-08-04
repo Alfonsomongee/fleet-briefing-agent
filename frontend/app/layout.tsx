@@ -1,15 +1,18 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+
 export const metadata: Metadata = {
-  title: "Fleet Briefing Dashboard",
-  description: "Daily VTC fleet operational briefings powered by DeepSeek",
+  title: "Fleet Briefing — Dashboard Operativo",
+  description: "Briefings diarios de flota VTC generados por IA",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es">
-      <body className="antialiased">{children}</body>
+    <html lang="es" className={inter.variable}>
+      <body className="font-sans antialiased">{children}</body>
     </html>
   );
 }

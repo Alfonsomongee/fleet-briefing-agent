@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+// All API calls go to Next.js API routes — no external backend needed.
 
 export interface Kpis {
   tasa_utilizacion: number;
@@ -34,8 +34,8 @@ export interface Briefing {
 }
 
 export async function fetchBriefings(date: string): Promise<Briefing[]> {
-  const res = await fetch(`${API_URL}/api/briefings?date=${date}`, {
-    next: { revalidate: 300 }, // cache 5 min
+  const res = await fetch(`/api/briefings?date=${date}`, {
+    next: { revalidate: 300 },
   });
   if (!res.ok) throw new Error(`API error: ${res.status}`);
   const data = await res.json();
@@ -43,7 +43,7 @@ export async function fetchBriefings(date: string): Promise<Briefing[]> {
 }
 
 export async function fetchDates(): Promise<string[]> {
-  const res = await fetch(`${API_URL}/api/dates`, { next: { revalidate: 60 } });
+  const res = await fetch("/api/dates", { next: { revalidate: 60 } });
   if (!res.ok) return [];
   const data = await res.json();
   return data.dates as string[];
