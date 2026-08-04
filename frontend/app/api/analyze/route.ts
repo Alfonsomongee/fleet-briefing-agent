@@ -87,23 +87,22 @@ function calcBaseline(rows: FleetRow[]): Kpis {
 }
 
 function detectAnomalies(today: Kpis, baseline: Kpis, threshold = 0.10): Anomaly[] {
-  return (Object.keys(today) as (keyof Kpis)[])
-    .map((kpi) => {
-      const base = baseline[kpi];
-      if (!base) return null;
-      const pct = ((today[kpi] - base) / base) * 100;
-      if (Math.abs(pct) <= 5) return null;
-      return {
-        kpi,
-        valor_hoy:       r4(today[kpi]),
-        valor_baseline:  r4(base),
-        desviacion_pct:  r2(pct),
-        direccion:       (pct < 0 ? "bajada" : "subida") as "bajada" | "subida",
-        critico:         Math.abs(pct) > threshold * 100,
-      };
-    })
-    .filter((x): x is Anomaly => x !== null)
-    .sort((a, b) => Math.abs(b.desviacion_pct) - Math.abs(a.desviacion_pct));
+  const results: Anomaly[] = [];
+  for (const kpi of Object.keys(today) as (keyof Kpis)[]) {
+    const base = baseline[kpi];
+    if (!base) continue;
+    const pct = ((today[kpi] - base) / base) * 100;
+    if (Math.abs(pct) <= 5) continue;
+    results.push({
+      kpi,
+      valor_hoy:       r4(today[kpi]),
+      valor_baseline:  r4(base),
+      desviacion_pct:  r2(pct),
+      direccion:       (pct < 0 ? "bajada" : "subida") as "bajada" | "subida",
+      critico:         Math.abs(pct) > threshold * 100,
+    });
+  }
+  return results.sort((a, b) => Math.abs(b.desviacion_pct) - Math.abs(a.desviacion_pct));
 }
 
 // ── DeepSeek call ─────────────────────────────────────────────────────────────
