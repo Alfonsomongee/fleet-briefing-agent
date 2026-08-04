@@ -1,0 +1,13 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+backend/output/*.json
+backend/output/*.html
+backend/data/fleet_data.csv
+.DS_Store
+venv/
+.venv/
+node_modules/
+.next/
+*.log
